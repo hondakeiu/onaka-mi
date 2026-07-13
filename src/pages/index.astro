@@ -1,9 +1,19 @@
 ---
-import { meta } from "../contents/meta";
-import Layout from "../layouts/Layout.astro";
+import { logs } from '../contents/logs';
+import { meta } from '../contents/meta';
+import { getDate, getAge, getAgeInDays, getTotalAmount, getTotalTimes } from '../scripts/logUtils';
+import Layout from '../layouts/Layout.astro';
+
+const latestLog = logs.at(-1)!;
+
+const displayDate = getDate(latestLog.date);
+const age = getAge(latestLog.date);
+const ageInDays = getAgeInDays(latestLog.date);
+const totalAmount = getTotalAmount(latestLog.milk);
+const totalTimes = getTotalTimes(latestLog.milk);
 ---
 
-<Layout meta={meta["home"]}>
+<Layout meta={meta['home']}>
   <div class="home">
     <div class="home__heading">
       <h1 class="text stencil" aria-label="miru? miyu, milk.">
@@ -16,19 +26,26 @@ import Layout from "../layouts/Layout.astro";
         <div class="home__onaka__frame">
           <img src="/onaka-mi/images/frame.svg" alt="" />
         </div>
-        <div class="home__onaka__canvas"></div>
+        <div class="home__onaka__canvas">
+          {latestLog.milk.map((item, index) => <span class="text stencil motif" data-index={index} data-time={item.time} data-amount={item.amount} />)}
+          <div class="text stencil tooltip" hidden>
+            <span class="tooltip__time"></span>
+            <span class="tooltip__motif"></span>
+            <span class="tooltip__amount"></span>
+          </div>
+        </div>
       </div>
       <figcaption class="home__caption">
         <p class="text stencil home__caption__title">miru?</p>
-        <time class="text stencil home__caption__date" datetime="2026-07-06">2026.07.06 ( Sat )</time>
+        <time class="text stencil home__caption__date" datetime={latestLog.date}>{displayDate}</time>
         <dl class="text stencil home__caption__content">
           <div>
             <dt>miyu</dt>
-            <dd>1m10d</dd>
+            <dd>{age} / {ageInDays}days</dd>
           </div>
           <div>
             <dt>milk</dt>
-            <dd>770ml</dd>
+            <dd>{totalAmount}ml / {totalTimes}times</dd>
           </div>
         </dl>
       </figcaption>
@@ -36,18 +53,19 @@ import Layout from "../layouts/Layout.astro";
   </div>
 </Layout>
 
-<style lang="scss">
-  @use "../styles/mixins/mq.scss" as *;
+<style lang="scss" is:global>
+  @use '../styles/mixins/mq.scss' as *;
 
   .home {
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-x: hidden;
     @include pc {
-      padding: 50px 0;
+      padding: 60px 0 50px;
     }
-    @include pc {
-      padding: 40px 0;
+    @include sp {
+      padding: 50px 0 30px;
     }
     &__heading {
       display: flex;
@@ -58,7 +76,7 @@ import Layout from "../layouts/Layout.astro";
         line-height: 1.3;
         letter-spacing: 0.05em;
         @include pc {
-          font-size: 32px;
+          font-size: 30px;
         }
         @include sp {
           font-size: 24px;
@@ -74,7 +92,7 @@ import Layout from "../layouts/Layout.astro";
         line-height: 1.5;
         letter-spacing: 0.15em;
         @include pc {
-          font-size: 14px;
+          font-size: 13px;
           margin-top: 6px;
         }
         @include sp {
@@ -88,7 +106,7 @@ import Layout from "../layouts/Layout.astro";
       flex-direction: column;
       align-items: center;
       @include pc {
-        margin-top: 50px;
+        margin-top: 40px;
       }
       @include sp {
         margin-top: 30px;
@@ -96,15 +114,16 @@ import Layout from "../layouts/Layout.astro";
     }
     &__onaka {
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       @include pc {
         width: 350px;
         height: 434px;
-        padding: 35px;
       }
       @include sp {
         width: 250px;
         height: 310px;
-        padding: 25px;
       }
       &__frame {
         position: absolute;
@@ -118,20 +137,164 @@ import Layout from "../layouts/Layout.astro";
       }
       &__canvas {
         position: relative;
-        width: 100%;
-        height: 100%;
+        flex-shrink: 0;
+        @include pc {
+          width: 280px;
+          height: 364px;
+        }
+        @include sp {
+          width: 200px;
+          height: 260px;
+        }
+        $motifs: (
+          heart: (
+            'a',
+            'b',
+          ),
+          bean: (
+            'a',
+            'b',
+          ),
+          candy: (
+            'a',
+            'b',
+            'c',
+          ),
+          haribo: (
+            'a',
+            'b',
+            'c',
+          ),
+          lolipop: (
+            'a',
+            'b',
+            'c',
+          ),
+        );
+        .motif {
+          position: absolute;
+          display: block;
+          top: 0;
+          left: 0;
+          will-change: transform;
+          &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            inset: 0;
+            background: rgba(#fff, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+          }
+          @each $name, $variants in $motifs {
+            &--#{$name} {
+              @each $variant in $variants {
+                &--#{$variant} {
+                  background: url('/onaka-mi/images/#{$name}_#{$variant}.svg') center / contain no-repeat;
+                  &::after {
+                    mask: url('/onaka-mi/images/#{$name}_#{$variant}.svg') no-repeat center / contain;
+                  }
+                }
+              }
+            }
+          }
+          &.is-current {
+            &::after {
+              opacity: 1;
+            }
+            &:hover {
+              &::after {
+              }
+            }
+          }
+        }
+        // .collision-debug {
+        //   position: absolute;
+        //   display: block;
+        //   top: 0;
+        //   left: 0;
+        //   overflow: visible;
+        //   // display: none;
+        //   polygon {
+        //     fill: rgba(red, 0.2);
+        //     stroke: red;
+        //     stroke-width: 1;
+        //   }
+        // }
+        .tooltip {
+          z-index: 2;
+          position: fixed;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: rgba(#614b4b, 0.7);
+          border-radius: 10px;
+          backdrop-filter: blur(2px);
+          pointer-events: none;
+          opacity: 0;
+          visibility: hidden;
+          @include pc {
+            top: 0;
+            left: 0;
+            padding: 20px 30px 15px;
+            row-gap: 10px;
+          }
+          @include sp {
+            position: absolute;
+            justify-content: space-between;
+            width: 140px;
+            height: 200px;
+            padding: 35px 0 30px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) !important;
+          }
+          &__time,
+          &__amount {
+            display: block;
+            line-height: 1.5;
+            color: var(--white);
+          }
+          &__time {
+            letter-spacing: 0.02em;
+            @include pc {
+              font-size: 14px;
+            }
+            @include sp {
+              font-size: 13px;
+            }
+          }
+          &__motif {
+            flex-shrink: 0;
+            display: block;
+          }
+          &__amount {
+            letter-spacing: 0.08em;
+            @include pc {
+              font-size: 15px;
+            }
+            @include sp {
+              font-size: 13px;
+            }
+          }
+        }
       }
     }
     &__caption {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       background: var(--white);
-      text-align: center;
       border-radius: 4px;
       @include pc {
-        margin-top: 40px;
+        margin-top: 35px;
+        width: 220px;
         padding: 15px 20px;
       }
       @include sp {
         margin-top: 30px;
+        width: 180px;
         padding: 12px 15px;
       }
       &__title {
@@ -159,30 +322,28 @@ import Layout from "../layouts/Layout.astro";
       }
       &__content {
         display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
         line-height: 1.5;
         letter-spacing: 0.05em;
         border-top: 1px solid var(--beige2);
         @include pc {
           font-size: 13px;
           margin-top: 10px;
-          padding: 10px 15px 0;
+          padding-top: 12px;
         }
         @include sp {
           font-size: 11px;
           margin-top: 8px;
-          padding: 8px 12px 0;
+          padding-top: 10px;
         }
         div {
           display: flex;
+          column-gap: 0.5em;
           dt {
             &::after {
-              content: ":";
-            }
-          }
-          & + div {
-            &::before {
-              content: "/";
-              margin: 0 0.5em;
+              content: ':';
             }
           }
         }
@@ -190,3 +351,378 @@ import Layout from "../layouts/Layout.astro";
     }
   }
 </style>
+
+<script>
+  import Matter from 'matter-js';
+  import decomp from 'poly-decomp';
+  import gsap from 'gsap';
+  import 'pathseg';
+  import { isSp } from '../scripts/mql';
+
+  Matter.Common.setDecomp(decomp);
+
+  const { Engine, Runner, Bodies, Body, Composite, Svg, Vertices, Query } = Matter;
+
+  const onaka = document.querySelector<HTMLElement>('.home__onaka__canvas')!;
+  const tooltip = onaka.querySelector<HTMLElement>('.tooltip')!;
+  const tooltipTime = tooltip.querySelector<HTMLSpanElement>('.tooltip__time')!;
+  const tooltipMotif = tooltip.querySelector<HTMLSpanElement>('.tooltip__motif')!;
+  const tooltipAmount = tooltip.querySelector<HTMLSpanElement>('.tooltip__amount')!;
+
+  const pointer = { x: 0, y: 0 };
+  let hoveredCandy: Candy | undefined;
+  const removingBodies = new WeakSet<Matter.Body>();
+
+  const onakaWidth = onaka.clientWidth;
+  const onakaHeight = onaka.clientHeight;
+
+  // const debugSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  // debugSvg.classList.add('collision-debug');
+  // debugSvg.setAttribute('width', `${onakaWidth}`);
+  // debugSvg.setAttribute('height', `${onakaHeight}`);
+  // debugSvg.setAttribute('viewBox', `0 0 ${onakaWidth} ${onakaHeight}`);
+  // onaka.appendChild(debugSvg);
+
+  const updateTooltip = (candy: Candy) => {
+    candy.element.classList.add('is-current');
+
+    tooltip.hidden = false;
+    tooltipTime.textContent = candy.element.dataset.time!;
+    tooltipAmount.textContent = `${Math.abs(Number(candy.element.dataset.amount))}ml`;
+
+    tooltipMotif.className = `tooltip__motif ${candy.motifClass}`;
+    tooltipMotif.style.width = `${(candy.width * 2) / 3}px`;
+    tooltipMotif.style.height = `${(candy.height * 2) / 3}px`;
+
+    gsap.to(tooltip, { autoAlpha: 1, duration: 0.3, ease: 'power1.out' });
+  };
+
+  const updateHover = (event: MouseEvent) => {
+    const rect = onaka.getBoundingClientRect();
+
+    pointer.x = event.clientX - rect.left;
+    pointer.y = event.clientY - rect.top;
+
+    gsap.set(tooltip, {
+      x: event.clientX + 20,
+      y: event.clientY - 20,
+    });
+
+    const hitBody = Query.point(bodies, pointer).at(-1);
+    const hitCandy = hitBody ? bodyMap.get(hitBody) : undefined;
+    const candy = hitCandy?.isSpitUp ? undefined : hitCandy;
+    onaka.style.cursor = candy ? 'pointer' : '';
+
+    if (candy === hoveredCandy) return;
+
+    clearHover();
+
+    if (!candy) {
+      hideTooltip();
+      return;
+    }
+
+    gsap.killTweensOf(tooltip);
+    hoveredCandy = candy;
+    updateTooltip(candy);
+  };
+
+  const showTooltip = (event: TouchEvent) => {
+    const touch = event.touches[0];
+    const rect = onaka.getBoundingClientRect();
+
+    pointer.x = touch.clientX - rect.left;
+    pointer.y = touch.clientY - rect.top;
+
+    const hitBody = Query.point(bodies, pointer).at(-1);
+    const hitCandy = hitBody ? bodyMap.get(hitBody) : undefined;
+    const candy = hitCandy?.isSpitUp ? undefined : hitCandy;
+
+    clearHover();
+
+    if (!candy) {
+      hideTooltip();
+      return;
+    }
+
+    hoveredCandy = candy;
+    updateTooltip(candy);
+  };
+
+  const clearHover = () => {
+    hoveredCandy?.element.classList.remove('is-current');
+    hoveredCandy = undefined;
+  };
+
+  const hideTooltip = () => {
+    clearHover();
+    gsap.killTweensOf(tooltip);
+    gsap.to(tooltip, {
+      autoAlpha: 0,
+      duration: 0.3,
+      ease: 'power1.out',
+      onComplete: () => {
+        tooltip.hidden = true;
+        onaka.style.cursor = '';
+      },
+    });
+  };
+
+  onaka.addEventListener('mouseenter', updateHover);
+  onaka.addEventListener('mousemove', updateHover);
+  onaka.addEventListener('mouseleave', hideTooltip);
+
+  onaka.addEventListener('touchstart', showTooltip);
+
+  const engine = Engine.create({ enableSleeping: true });
+
+  engine.gravity.x = 0;
+  engine.gravity.y = 0.9;
+
+  const motifScale = isSp() ? 0.7 : 1;
+
+  const motifs = {
+    20: { name: 'heart', width: 34 * motifScale, height: 30 * motifScale, density: 0.008, variants: ['a', 'b'] },
+    40: { name: 'bean', width: 46 * motifScale, height: 30 * motifScale, density: 0.004, variants: ['a', 'b'] },
+    60: { name: 'candy', width: 66 * motifScale, height: 36 * motifScale, density: 0.004, variants: ['a', 'b'] },
+    80: { name: 'haribo', width: 58 * motifScale, height: 91 * motifScale, density: 0.002, variants: ['a', 'b', 'c'] },
+    100: { name: 'lolipop', width: 96 * motifScale, height: 168 * motifScale, density: 0.001, variants: ['a', 'b', 'c'] },
+  } as const;
+
+  const vertexCache = new Map<string, Matter.Vector[][]>();
+
+  const loadVertexSets = async (name: string) => {
+    const cached = vertexCache.get(name);
+    if (cached) return cached;
+
+    const response = await fetch(`/onaka-mi/images/${name}_collision.svg`)!;
+    const svgText = await response.text();
+    const svgDocument = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+    const paths = [...svgDocument.querySelectorAll<SVGPathElement>('path')];
+    const vertexSets = paths.map((path) => Svg.pathToVertices(path, 8));
+
+    vertexCache.set(name, vertexSets);
+
+    return vertexSets;
+  };
+
+  type Candy = {
+    body: Matter.Body;
+    element: HTMLSpanElement;
+    width: number;
+    height: number;
+    originX: number;
+    originY: number;
+    motifClass: string;
+    isSpitUp: boolean;
+    // debugPolygons: SVGPolygonElement[];
+  };
+
+  const candies: Candy[] = [];
+  const bodies: Matter.Body[] = [];
+  const bodyMap = new Map<Matter.Body, Candy>();
+  const elements = [...onaka.querySelectorAll<HTMLSpanElement>('.motif')];
+
+  const fallGap = 120;
+  const wallThickness = 20;
+  const wallOptions = { isStatic: true };
+  const spawnAreaHeight = elements.length * fallGap + 200;
+  const sideWallHeight = onakaHeight + spawnAreaHeight;
+  const sideWallY = (onakaHeight - spawnAreaHeight) / 2;
+
+  const floor = Bodies.rectangle(onakaWidth / 2, onakaHeight + wallThickness / 2, onakaWidth, wallThickness, wallOptions);
+  const leftWall = Bodies.rectangle(-wallThickness / 2, sideWallY, wallThickness, sideWallHeight, wallOptions);
+  const rightWall = Bodies.rectangle(onakaWidth + wallThickness / 2, sideWallY, wallThickness, sideWallHeight, wallOptions);
+  const walls = [floor, leftWall, rightWall];
+
+  Composite.add(engine.world, walls);
+
+  const variantHistory = new Map<string, string[]>();
+  const getVariant = (name: string, variants: readonly string[]) => {
+    const history = variantHistory.get(name) ?? [];
+    const lastTwo = history.slice(-2);
+    const availableVariants = lastTwo.length === 2 && lastTwo[0] === lastTwo[1] ? variants.filter((variant) => variant !== lastTwo[0]) : variants;
+    const variant = availableVariants[Math.floor(Math.random() * availableVariants.length)];
+
+    variantHistory.set(name, [...history, variant]);
+
+    return variant;
+  };
+
+  const update = () => {
+    let allSleeping = true;
+
+    for (let i = candies.length - 1; i >= 0; i--) {
+      const candy = candies[i];
+      // const { body, element, originX, originY, isSpitUp, debugPolygons } = candy;
+      const { body, element, originX, originY, isSpitUp } = candy;
+
+      element.style.transform = `
+      translate(
+        ${body.position.x - originX}px,
+        ${body.position.y - originY}px
+      )
+      rotate(${body.angle}rad)
+    `;
+
+      if (isSpitUp && body.bounds.min.y > floor.bounds.max.y && !removingBodies.has(body)) {
+        removingBodies.add(body);
+
+        gsap.to(element, {
+          autoAlpha: 0,
+          duration: 0.3,
+          ease: 'power1.out',
+          onComplete: () => {
+            Composite.remove(engine.world, body);
+
+            const candyIndex = candies.indexOf(candy);
+            if (candyIndex !== -1) {
+              candies.splice(candyIndex, 1);
+            }
+
+            const bodyIndex = bodies.indexOf(body);
+            if (bodyIndex !== -1) {
+              bodies.splice(bodyIndex, 1);
+            }
+
+            bodyMap.delete(body);
+          },
+        });
+      }
+
+      // const collisionParts = body.parts.length > 1 ? body.parts.slice(1) : [body];
+      // collisionParts.forEach((part, index) => {
+      //   debugPolygons[index].setAttribute('points', part.vertices.map(({ x, y }) => `${x},${y}`).join(' '));
+      // });
+
+      if (!body.isSleeping) {
+        allSleeping = false;
+      }
+    }
+
+    if (!allSleeping) {
+      requestAnimationFrame(update);
+    }
+  };
+
+  const init = async () => {
+    elements.forEach((element) => {
+      element.style.visibility = 'hidden';
+    });
+
+    await Promise.all(Object.values(motifs).map(({ name }) => loadVertexSets(name)));
+
+    let spitUpIndex = 0;
+
+    for (const [index, element] of elements.entries()) {
+      const signedAmount = Number(element.dataset.amount);
+      if (signedAmount === 0) {
+        element.remove();
+        continue;
+      }
+
+      const isSpitUp = signedAmount < 0;
+      const amount = Math.abs(signedAmount);
+      const key = Math.min(Math.max(Math.ceil(amount / 20) * 20, 20), 100) as keyof typeof motifs;
+      const motif = motifs[key];
+      const variant = getVariant(motif.name, motif.variants);
+      const motifNameClass = `motif--${motif.name}`;
+      const motifVariantClass = `motif--${motif.name}--${variant}`;
+      const motifWidth = motif.width;
+      const motifHeight = motif.height;
+
+      element.classList.add(motifNameClass, motifVariantClass);
+      element.style.width = `${motifWidth}px`;
+      element.style.height = `${motifHeight}px`;
+
+      const outsideGap = 5;
+      const fromLeft = isSpitUp ? spitUpIndex % 2 === 0 : false;
+      // const spawnX = isSpitUp ? (fromLeft ? -wallThickness - motifWidth / 2 - outsideGap : onakaWidth + wallThickness + motifWidth / 2 + outsideGap) : onakaWidth * (0.3 + Math.random() * 0.4);
+      const spawnX = isSpitUp ? (fromLeft ? -wallThickness - motifWidth / 2 - outsideGap : onakaWidth + wallThickness + motifWidth / 2 + outsideGap) : onakaWidth * (0.3 + Math.random() * 0.4);
+      const spawnY = -50 - index * fallGap;
+
+      if (isSpitUp) {
+        spitUpIndex++;
+      }
+
+      const sourceVertexSets = await loadVertexSets(motif.name);
+
+      const bodyOptions = {
+        label: motif.name,
+        density: motif.density,
+        restitution: 0.6,
+        friction: 0.1,
+        frictionStatic: 0.1,
+        frictionAir: 0.03,
+      };
+
+      const parts = sourceVertexSets.map((sourceVertices) => {
+        const vertexBody = Body.create({});
+        const vertices = Vertices.create(
+          sourceVertices.map(({ x, y }) => ({ x: x * motifScale, y: y * motifScale })),
+          vertexBody,
+        );
+        const centre = Vertices.centre(vertices);
+
+        return Bodies.fromVertices(spawnX + centre.x - motifWidth / 2, spawnY + centre.y - motifHeight / 2, [vertices], bodyOptions, true);
+      });
+
+      const body =
+        parts.length === 1
+          ? parts[0]
+          : Body.create({
+              parts,
+              ...bodyOptions,
+            });
+
+      Body.setAngle(body, (Math.random() - 0.5) * ((Math.PI * 2) / 3));
+
+      const originX = motifWidth / 2 + body.position.x - spawnX;
+      const originY = motifHeight / 2 + body.position.y - spawnY;
+
+      const motifClass = `${motifNameClass} ${motifVariantClass}`;
+
+      // const collisionParts = body.parts.length > 1 ? body.parts.slice(1) : [body];
+      // const debugPolygons = collisionParts.map(() => {
+      //   const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      //   debugSvg.appendChild(polygon);
+      //   return polygon;
+      // });
+
+      // const candy: Candy = { body, element, width: motifWidth, height: motifHeight, originX, originY, motifClass, isSpitUp, debugPolygons };
+      const candy: Candy = { body, element, width: motifWidth, height: motifHeight, originX, originY, motifClass, isSpitUp };
+
+      candies.push(candy);
+      bodies.push(body);
+      bodyMap.set(body, candy);
+
+      Composite.add(engine.world, body);
+
+      element.style.transformOrigin = `${originX}px ${originY}px`;
+      element.style.transform = `
+        translate(
+          ${body.position.x - originX}px,
+          ${body.position.y - originY}px
+        )
+        rotate(${body.angle}rad)
+      `;
+      element.style.visibility = 'visible';
+    }
+
+    const runner = Runner.create({ delta: 1000 / 60 });
+    Runner.run(runner, engine);
+
+    update();
+  };
+
+  let resizeTimer: number;
+
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      window.location.reload();
+    }, 200);
+  });
+
+  init();
+</script>
