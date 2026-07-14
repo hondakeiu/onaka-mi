@@ -1,0 +1,21 @@
+---
+import { logs } from '../contents/logs';
+import LogLayout from '../layouts/LogLayout.astro';
+
+export async function getStaticPaths() {
+  return logs.map((log) => ({
+    params: {
+      date: log.date,
+    },
+    props: {
+      log,
+    },
+  }));
+}
+
+const { log } = Astro.props;
+
+const pageTitle = log.date;
+---
+
+<LogLayout pageName="log" log={log} />

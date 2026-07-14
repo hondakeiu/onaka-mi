@@ -1,14 +1,14 @@
 ---
-import "../styles/global.scss";
-import { type Meta, type PageName, sitename, siteurl } from "../contents/meta";
-import AdobeFonts from "../components/AdobeFonts.astro";
+import '../styles/global.scss';
+import { type Meta, type PageName, sitename, siteurl } from '../contents/meta';
+import AdobeFonts from '../components/AdobeFonts.astro';
 
 interface Props {
   meta: Meta;
 }
 const { meta } = Astro.props;
 
-const pagetitle = `${meta.title}${meta.name !== "home" ? ` | ${sitename}` : ""}`;
+const pagetitle = `${meta.title}${meta.name !== 'home' ? `｜${sitename}` : ''}`;
 const pageurl = siteurl + Astro.url.pathname;
 ---
 

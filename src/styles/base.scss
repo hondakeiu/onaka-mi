@@ -5,8 +5,9 @@
   --brown: #7b6565;
   --white: #fff9f6;
   --beige: #c09b9c;
-  --beige2: #f6ebeb;
-  --beige3: #f9e9e9;
+  --beige2: #caaeae;
+  --beige3: #f6ebeb;
+  --beige4: #f9e9e9;
 }
 
 body {
@@ -18,12 +19,17 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: var(--beige3);
+  background: var(--beige4);
   color: var(--brown);
   font-style: normal;
   text-spacing-trim: space-all;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 button {

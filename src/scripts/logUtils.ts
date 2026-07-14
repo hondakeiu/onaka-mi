@@ -10,17 +10,20 @@ export type DailyLog = {
 
 const birthday = new Date('2026-05-24T00:00:00');
 
-const weekMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
-
 export const getDate = (date: string) => {
   const current = new Date(`${date}T00:00:00`);
-
   const year = current.getFullYear();
   const month = String(current.getMonth() + 1).padStart(2, '0');
   const day = String(current.getDate()).padStart(2, '0');
-  const week = weekMap[current.getDay()];
+  return `${year}.${month}.${day}`;
+};
 
-  return `${year}.${month}.${day} ( ${week} )`;
+const weekMap = ['日', '月', '火', '水', '木', '金', '土'];
+
+export const getDay = (date: string) => {
+  const current = new Date(`${date}T00:00:00`);
+  const week = weekMap[current.getDay()];
+  return week;
 };
 
 export const getAge = (date: string) => {
