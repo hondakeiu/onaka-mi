@@ -1,0 +1,75 @@
+<header class="header">
+  <ul class="text stencil">
+    <li>
+      <a href="/onaka-mi/">top</a>
+    </li>
+    <li>
+      <a href="/onaka-mi/calendar/">calendar</a>
+    </li>
+    <li>
+      <a href="/onaka-mi/about/">about</a>
+    </li>
+  </ul>
+</header>
+
+<style lang="scss">
+  @use '../styles/mixins/mq.scss' as *;
+
+  body {
+    @include pc {
+      padding-bottom: 5.5rem;
+    }
+    @include sp {
+      padding-bottom: 4.5rem;
+    }
+  }
+  .header {
+    z-index: 10;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--brown);
+    @include pc {
+      height: 5.5rem;
+    }
+    @include sp {
+      height: 4.5rem;
+    }
+    ul {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      @include pc {
+        column-gap: 2rem;
+      }
+      @include sp {
+        column-gap: 1.5rem;
+      }
+      a {
+        display: block;
+        background: rgba(#fff9f6, 0.1);
+        color: var(--white);
+        border-radius: 9999px;
+        letter-spacing: 0.05em;
+        @include pc {
+          font-size: 1.4rem;
+          padding: 0.5rem 2.5rem;
+        }
+        @include sp {
+          font-size: 1.2rem;
+          padding: 0.4rem 2rem;
+        }
+        @include hover {
+          transition: background 0.3s ease-out;
+          &:hover {
+            background: rgba(#fff9f6, 0.2);
+          }
+        }
+      }
+    }
+  }
+</style>

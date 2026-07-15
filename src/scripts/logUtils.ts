@@ -18,7 +18,7 @@ export const getDate = (date: string) => {
   return `${year}.${month}.${day}`;
 };
 
-const weekMap = ['日', '月', '火', '水', '木', '金', '土'];
+const weekMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export const getDay = (date: string) => {
   const current = new Date(`${date}T00:00:00`);

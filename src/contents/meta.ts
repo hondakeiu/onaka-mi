@@ -4,7 +4,7 @@ export type Meta = {
   description?: string;
 };
 
-export type PageName = 'home' | 'log';
+export type PageName = 'home' | 'log' | 'calendar' | 'about';
 
 export const sitename = '今日のおなか';
 export const siteDescription = 'みゆちゃんのミルクの記録';
@@ -20,5 +20,15 @@ export const meta: { [key in PageName]: Meta } = {
   log: {
     name: 'log',
     description: siteDescription,
+  },
+  calendar: {
+    name: 'calendar',
+    title: 'calendar',
+    description: '',
+  },
+  about: {
+    name: 'about',
+    title: 'about',
+    description: '',
   },
 };

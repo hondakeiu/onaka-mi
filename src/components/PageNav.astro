@@ -1,0 +1,50 @@
+---
+import clsx from 'clsx';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<nav class={clsx('pagenav', className)}>
+  <slot name="prev" />
+  <slot name="body" />
+  <slot name="next" />
+</nav>
+
+<style lang="scss" is:global>
+  @use '../styles/mixins/mq.scss' as *;
+
+  .pagenav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include pc {
+      margin-top: 3rem;
+      column-gap: 3.5rem;
+    }
+    @include sp {
+      margin-top: 2.7rem;
+      column-gap: 2.5rem;
+    }
+    &__body {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--white);
+      border-radius: 0.4rem;
+      @include pc {
+        width: 22rem;
+        height: 13rem;
+      }
+      @include sp {
+        width: 16.5rem;
+        height: 10rem;
+      }
+    }
+  }
+</style>

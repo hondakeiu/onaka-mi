@@ -1,0 +1,58 @@
+---
+import clsx from 'clsx';
+
+interface Props {
+  class?: string;
+  h1: string;
+  h1label?: string;
+  p: string;
+}
+
+const { class: className, h1, h1label, p } = Astro.props;
+---
+
+<div class={clsx('pageheader', className)}>
+  <h1 class="text stencil">
+    {h1label ? <span aria-hidden="true" set:html={h1} /> : h1}
+  </h1>
+  <p class="text shuei">{p}</p>
+</div>
+
+<style lang="scss" is:global>
+  @use '../styles/mixins/mq.scss' as *;
+
+  .pageheader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    h1 {
+      display: block;
+      line-height: 1.3;
+      letter-spacing: 0.05em;
+      @include pc {
+        font-size: 3rem;
+      }
+      @include sp {
+        font-size: 2.4rem;
+      }
+      span {
+        span {
+          color: var(--beige);
+        }
+      }
+    }
+    p {
+      display: block;
+      line-height: 1.5;
+      letter-spacing: 0.15em;
+      @include pc {
+        font-size: 1.3rem;
+        margin-top: 0.6rem;
+      }
+      @include sp {
+        font-size: 1.1rem;
+        margin-top: 0.4rem;
+      }
+    }
+  }
+</style>

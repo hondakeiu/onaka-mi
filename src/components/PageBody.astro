@@ -1,0 +1,27 @@
+---
+import clsx from 'clsx';
+
+interface Props {
+  class?: string;
+  tag?: 'div' | 'figure';
+}
+
+const { class: className, tag = 'div' } = Astro.props;
+
+const Tag = tag;
+---
+
+<Tag class={clsx('pagebody', className)}>
+  <slot />
+</Tag>
+
+<style lang="scss" is:global>
+  @use '../styles/mixins/mq.scss' as *;
+
+  .pagebody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 3rem;
+  }
+</style>

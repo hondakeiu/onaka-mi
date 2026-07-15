@@ -2,6 +2,7 @@
 import '../styles/global.scss';
 import { type Meta, type PageName, sitename, siteurl } from '../contents/meta';
 import AdobeFonts from '../components/AdobeFonts.astro';
+import Header from '../components/Header.astro';
 
 interface Props {
   meta: Meta;
@@ -33,6 +34,7 @@ const pageurl = siteurl + Astro.url.pathname;
   </head>
   <body>
     <main>
+      <Header />
       <slot />
     </main>
   </body>

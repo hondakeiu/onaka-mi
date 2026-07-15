@@ -1,0 +1,30 @@
+---
+import clsx from 'clsx';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class={clsx('page', className)}>
+  <slot />
+</div>
+
+<style lang="scss" is:global>
+  @use '../styles/mixins/mq.scss' as *;
+
+  .page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    @include pc {
+      padding: 5rem 0;
+    }
+    @include sp {
+      padding: 4rem 0 3rem;
+    }
+  }
+</style>

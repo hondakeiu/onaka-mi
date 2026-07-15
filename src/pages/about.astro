@@ -1,0 +1,244 @@
+---
+import { meta } from '../contents/meta';
+import Layout from '../layouts/Layout.astro';
+import Page from '../components/Page.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PageBody from '../components/PageBody.astro';
+import PageNav from '../components/PageNav.astro';
+import CircleArrowButton from '../components/CircleArrowButton.astro';
+import PageMain from '../components/PageMain.astro';
+
+const collections = [
+  {
+    title: 'onaka collection',
+    motifs: [
+      { image: 'heart_b', alt: 'ハート' },
+      { image: 'bean_a', alt: 'ゼリービーンズ' },
+      { image: 'candy_b', alt: 'キャンディ' },
+      { image: 'haribo_a', alt: 'ハリボー' },
+      { image: 'lolipop_a', alt: 'ペロペロキャンディ' },
+    ],
+  },
+  {
+    title: '1ml ~ 20ml',
+    motifs: [
+      { image: 'heart_a', alt: 'ハート' },
+      { image: 'heart_b', alt: 'ハート' },
+    ],
+  },
+  {
+    title: '21ml ~ 40ml',
+    motifs: [
+      { image: 'bean_a', alt: 'ゼリービーンズ' },
+      { image: 'bean_b', alt: 'ゼリービーンズ' },
+    ],
+  },
+  {
+    title: '41ml ~ 60ml',
+    motifs: [
+      { image: 'candy_a', alt: 'キャンディ' },
+      { image: 'candy_b', alt: 'キャンディ' },
+    ],
+  },
+  {
+    title: '61ml ~ 80ml',
+    motifs: [
+      { image: 'haribo_a', alt: 'ハリボー' },
+      { image: 'haribo_b', alt: 'ハリボー' },
+      { image: 'haribo_c', alt: 'ハリボー' },
+    ],
+  },
+  {
+    title: '81ml ~ 100ml',
+    motifs: [
+      { image: 'lolipop_a', alt: 'ペロペロキャンディ' },
+      { image: 'lolipop_b', alt: 'ペロペロキャンディ' },
+      { image: 'lolipop_c', alt: 'ペロペロキャンディ' },
+    ],
+  },
+];
+---
+
+<Layout meta={meta['about']}>
+  <Page class="about">
+    <PageHeader h1="about" p="「今日のおなか」とは？" />
+    <PageBody>
+      <PageMain>
+        <div class="text shuei about__message">
+          <p>小さいおなかいっぱいにミルクを飲んで<br />大きくなっていく赤ちゃん。</p>
+          <p>少しずつ飲んで何度も頑張った日。<br />せっかく飲んだのに吐き戻してしまった日。<br />たくさん飲めてうれしかった日。</p>
+          <p>これは、そんな日々のミルクの記録を<br />お菓子に変えて残した小さなアルバムです。</p>
+          <p>大変だった毎日も、少し時間が経って<br />「今日のおなか」を眺めていると<br />全部がかわいい思い出になりました。</p>
+        </div>
+      </PageMain>
+      <PageNav class="about__collection">
+        <Fragment slot="prev">
+          <CircleArrowButton class="swiper-button-prev" button={true} direction="prev" label="前へ" />
+        </Fragment>
+        <Fragment slot="body">
+          <div class="pagenav__body swiper">
+            <div class="swiper-wrapper">
+              {
+                collections.map((collection, index) => (
+                  <div class={`swiper-slide swiper-slide--${index === 0 ? 'top' : String(index).padStart(2, '0')}`}>
+                    <p class="text stencil">{collection.title}</p>
+                    <ul>
+                      {collection.motifs.map((motif) => (
+                        <li>
+                          <img class={`motif motif--${motif.image.split('_')[0]}`} src={`/onaka-mi/images/${motif.image}.svg`} alt={motif.alt} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </Fragment>
+        <Fragment slot="next">
+          <CircleArrowButton class="swiper-button-next" button={true} label="次へ" />
+        </Fragment>
+      </PageNav>
+    </PageBody>
+  </Page>
+</Layout>
+
+<style lang="scss" is:global>
+  @use '../styles/mixins/mq.scss' as *;
+
+  .about {
+    &__message {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      @include pc {
+        row-gap: 2rem;
+      }
+      @include sp {
+        row-gap: 1.5rem;
+      }
+      p {
+        display: block;
+        @include pc {
+          font-size: 1.2rem;
+          line-height: 2.2;
+          letter-spacing: 0.05em;
+        }
+        @include sp {
+          font-size: 0.9rem;
+          line-height: 2;
+          letter-spacing: 0.03em;
+        }
+      }
+    }
+    &__collection {
+      .swiper {
+        &-slide {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          padding-top: 0.5rem;
+          @include pc {
+            row-gap: 0.7rem;
+          }
+          @include sp {
+            row-gap: 0.5rem;
+          }
+          p {
+            display: block;
+            line-height: 1.5;
+            letter-spacing: 0.1em;
+            @include pc {
+              font-size: 1.5rem;
+            }
+            @include sp {
+              font-size: 1.1rem;
+            }
+          }
+          ul {
+            display: flex;
+            align-items: center;
+            @include pc {
+              height: 6rem;
+              column-gap: 1rem;
+            }
+            @include sp {
+              height: 4.2rem;
+              column-gap: 0.7rem;
+            }
+            .motif {
+              @include pc {
+                font-size: 1rem;
+              }
+              @include sp {
+                font-size: 0.7rem;
+              }
+              &--heart {
+                width: 2em;
+              }
+              &--bean {
+                width: 2.4em;
+              }
+              &--candy {
+                width: 3.5em;
+              }
+              &--haribo {
+                width: 2.7em;
+              }
+              &--lolipop {
+                width: 3em;
+              }
+            }
+          }
+          &--top {
+            p {
+              scale: 1.1;
+              transform-origin: center bottom;
+            }
+            ul {
+              column-gap: 0.7rem;
+            }
+          }
+        }
+        &-button-prev,
+        &-button-next {
+          z-index: 2;
+          position: relative;
+          top: unset;
+          left: unset;
+          bottom: unset;
+          right: unset;
+          margin: 0;
+          svg {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+</style>
+
+<script>
+  import Swiper from 'swiper';
+  import { EffectFade, Navigation } from 'swiper/modules';
+
+  const swiperEl = document.querySelector<HTMLElement>('.swiper')!;
+
+  const swiper = new Swiper(swiperEl, {
+    modules: [EffectFade, Navigation],
+    effect: 'fade',
+    fadeEffect: {
+      crossFade: true,
+    },
+    speed: 300,
+    loop: false,
+    grabCursor: true,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+      disabledClass: 'is-disabled',
+    },
+  });
+</script>

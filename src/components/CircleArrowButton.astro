@@ -1,0 +1,80 @@
+---
+import clsx from 'clsx';
+
+interface Props {
+  class?: string;
+  href?: string;
+  button?: boolean;
+  label: string;
+  direction?: 'prev' | 'next';
+  disabled?: boolean;
+}
+
+const { class: className, href, button, label, direction = 'next', disabled = false } = Astro.props;
+
+const arrowClass = direction === 'prev' ? 'arrow arrow--prev' : 'arrow';
+---
+
+{
+  disabled ? (
+    <span class={clsx('circlearrowbutton', 'is-disabled', className)} aria-hidden="true">
+      <span class={arrowClass} />
+    </span>
+  ) : button ? (
+    <button class={clsx('circlearrowbutton', className)} type="button" aria-label={label}>
+      <span class={arrowClass} />
+    </button>
+  ) : (
+    <a href={href} class={clsx('circlearrowbutton', className)} aria-label={label}>
+      <span class={arrowClass} />
+    </a>
+  )
+}
+
+<style lang="scss" is:global>
+  @use '../styles/mixins/mq.scss' as *;
+
+  .circlearrowbutton {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--beige2);
+    color: var(--white) !important;
+    border-radius: 50%;
+    @include pc {
+      width: 3.5rem !important;
+      height: 3.5rem !important;
+    }
+    @include sp {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+    }
+    .arrow {
+      display: block;
+      background: currentColor;
+      mask: url('/onaka-mi/images/arrow.svg') center / contain no-repeat;
+      @include pc {
+        width: 1.2rem;
+        height: 1.2rem;
+      }
+      @include sp {
+        width: 0.9rem;
+        height: 0.9rem;
+      }
+      &--prev {
+        rotate: 180deg;
+      }
+    }
+    &.is-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    @include hover {
+      transition: background 0.4s ease-out;
+      &:hover {
+        background: var(--beige);
+      }
+    }
+  }
+</style>

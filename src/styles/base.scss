@@ -10,6 +10,10 @@
   --beige4: #f9e9e9;
 }
 
+html {
+  font-size: 10px;
+}
+
 body {
   position: relative;
   width: 100%;
@@ -36,6 +40,10 @@ button {
   text-align: left;
   color: inherit;
   -webkit-tap-highlight-color: transparent;
+}
+
+li {
+  list-style: none;
 }
 
 img {
