@@ -1,0 +1,17 @@
+---
+import { logs } from '../../contents/logs';
+import MemoriesLayout from '../../layouts/MemoriesLayout.astro';
+
+export const getStaticPaths = () => {
+  const months = [...new Set(logs.map(({ date }) => date.slice(0, 7)))];
+
+  return months.map((month) => ({
+    params: { month },
+    props: { month },
+  }));
+};
+
+const { month } = Astro.props;
+---
+
+<MemoriesLayout pageName="month" month={month} />

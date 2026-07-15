@@ -1,10 +1,10 @@
 <header class="header">
   <ul class="text stencil">
     <li>
-      <a href="/onaka-mi/">top</a>
+      <a href="/onaka-mi/">home</a>
     </li>
     <li>
-      <a href="/onaka-mi/calendar/">calendar</a>
+      <a href="/onaka-mi/memories/">memories</a>
     </li>
     <li>
       <a href="/onaka-mi/about/">about</a>
@@ -63,13 +63,37 @@
           font-size: 1.2rem;
           padding: 0.4rem 2rem;
         }
+        &.is-current {
+          background: rgba(#fff9f6, 0.3);
+        }
         @include hover {
-          transition: background 0.3s ease-out;
+          transition:
+            background 0.35s ease-out,
+            color 0.35s ease-out;
           &:hover {
-            background: rgba(#fff9f6, 0.2);
+            background: var(--white);
+            color: var(--brown);
           }
         }
       }
     }
   }
 </style>
+
+<script>
+  const normalize = (path: string) => path.replace(/\/$/, '');
+
+  const current = normalize(window.location.pathname);
+
+  document.querySelectorAll<HTMLAnchorElement>('.header a').forEach((link) => {
+    const href = normalize(link.pathname);
+
+    if (href === '/onaka-mi') {
+      if (!current.startsWith('/onaka-mi/memories') && !current.startsWith('/onaka-mi/about')) {
+        link.classList.add('is-current');
+      }
+    } else if (current.startsWith(href)) {
+      link.classList.add('is-current');
+    }
+  });
+</script>

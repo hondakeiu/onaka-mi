@@ -4,7 +4,7 @@ export type Meta = {
   description?: string;
 };
 
-export type PageName = 'home' | 'log' | 'calendar' | 'about';
+export type PageName = 'home' | 'log' | 'memories' | 'month' | 'about';
 
 export const sitename = '今日のおなか';
 export const siteDescription = 'みゆちゃんのミルクの記録';
@@ -21,14 +21,19 @@ export const meta: { [key in PageName]: Meta } = {
     name: 'log',
     description: siteDescription,
   },
-  calendar: {
-    name: 'calendar',
-    title: 'calendar',
-    description: '',
+  memories: {
+    name: 'memories',
+    title: 'memories',
+    description: '振り返りカレンダー',
+  },
+  month: {
+    name: 'month',
+    title: 'memories',
+    description: '振り返りカレンダー',
   },
   about: {
     name: 'about',
     title: 'about',
-    description: '',
+    description: '「今日のおなか」とは？',
   },
 };

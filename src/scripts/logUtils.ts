@@ -29,6 +29,10 @@ export const getDay = (date: string) => {
 export const getAge = (date: string) => {
   const current = new Date(`${date}T00:00:00`);
 
+  if (current < birthday) {
+    return '0m0d';
+  }
+
   let months = current.getFullYear() * 12 + current.getMonth() - (birthday.getFullYear() * 12 + birthday.getMonth());
   let days = current.getDate() - birthday.getDate();
 

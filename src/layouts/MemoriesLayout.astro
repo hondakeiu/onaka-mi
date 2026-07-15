@@ -1,0 +1,268 @@
+---
+import { logs } from '../contents/logs';
+import { getAge } from '../scripts/logUtils';
+import { getTotalAmount } from '../scripts/logUtils';
+import { getTotalTimes } from '../scripts/logUtils';
+import { meta, type PageName } from '../contents/meta';
+import Layout from '../layouts/Layout.astro';
+import Page from '../components/Page.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PageBody from '../components/PageBody.astro';
+import PageMain from '../components/PageMain.astro';
+import PageNav from '../components/PageNav.astro';
+import CircleArrowButton from '../components/CircleArrowButton.astro';
+
+interface Props {
+  pageName: PageName;
+  month: string;
+}
+
+const { pageName, month } = Astro.props;
+
+const months = [...new Set(logs.map(({ date }) => date.slice(0, 7)))];
+
+const firstDate = new Date(`${month}-01`);
+const lastDate = new Date(firstDate.getFullYear(), firstDate.getMonth() + 1, 0);
+
+const daysInMonth = lastDate.getDate();
+const firstWeekday = (firstDate.getDay() + 6) % 7;
+const cells = Array.from({ length: 42 }, (_, index) => {
+  const day = index - firstWeekday + 1;
+
+  if (day < 1 || day > daysInMonth) {
+    return undefined;
+  }
+
+  const date = `${month}-${String(day).padStart(2, '0')}`;
+  const log = logs.find((log) => log.date === date);
+
+  return { day, log };
+});
+const weeks = Array.from({ length: 6 }, (_, week) => cells.slice(week * 7, (week + 1) * 7));
+
+const monthIndex = months.indexOf(month);
+
+const prevHref = monthIndex > 0 ? `/onaka-mi/memories/${months[monthIndex - 1]}/` : undefined;
+const nextHref = monthIndex < months.length - 1 ? `/onaka-mi/memories/${months[monthIndex + 1]}/` : undefined;
+
+const displayMonth = month.replace('-', '.');
+
+const firstAge = getAge(`${month}-01`);
+const lastAge = getAge(`${month}-${lastDate.getDate()}`);
+
+let totalAmount = 0;
+let totalTimes = 0;
+logs
+  .filter(({ date }) => date.startsWith(month))
+  .forEach((log) => {
+    totalAmount += getTotalAmount(log.milk);
+    totalTimes += getTotalTimes(log.milk);
+  });
+---
+
+<Layout meta={{ ...meta[pageName], ...(pageName === 'month' ? { title: `${displayMonth}｜${meta[pageName].title}` } : {}) }}>
+  <Page class="memories">
+    <PageHeader h1="memories" p="振り返りカレンダー" />
+    <PageBody>
+      <PageMain>
+        <div class="text stencil memories__month">
+          <div class="memories__month__header">
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+            <span>Sun</span>
+          </div>
+          <div class="memories__month__body">
+            {
+              weeks.map((week) => (
+                <div class="memories__month__week">
+                  {week.map((cell) => (cell ? cell.log ? <a href={`/onaka-mi/${cell.log.date}/`}>{cell.day}</a> : <span>{cell.day}</span> : <span aria-hidden="true" />))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </PageMain>
+    </PageBody>
+    <PageNav>
+      <Fragment slot="prev">
+        <CircleArrowButton href={prevHref} direction="prev" label="前の月" disabled={!prevHref} />
+      </Fragment>
+      <Fragment slot="body">
+        <div class="pagenav__body memories__caption">
+          <p class="text stencil memories__caption__title">calendar</p>
+          <time class="text stencil memories__caption__date" datetime={month}>{displayMonth}</time>
+          <dl class="text stencil memories__caption__content">
+            <div>
+              <dt>miyu</dt>
+              <dd>{firstAge} ~ {lastAge}</dd>
+            </div>
+            <div>
+              <dt>milk</dt>
+              <dd>{totalAmount}ml / {totalTimes}times</dd>
+            </div>
+          </dl>
+        </div>
+      </Fragment>
+      <Fragment slot="next">
+        <CircleArrowButton href={nextHref} direction="next" label="次の月" disabled={!nextHref} />
+      </Fragment>
+    </PageNav>
+  </Page>
+</Layout>
+
+<style lang="scss" is:global>
+  @use '../styles/mixins/mq.scss' as *;
+
+  .memories {
+    &__month {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      @include pc {
+        row-gap: 2.5rem;
+      }
+      @include sp {
+        row-gap: 1.5rem;
+      }
+      &__header,
+      &__week {
+        display: flex;
+        @include pc {
+          column-gap: 0.8rem;
+        }
+        @include sp {
+          column-gap: 0.5rem;
+        }
+        a,
+        span {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          line-height: 1.5;
+          letter-spacing: 0.02em;
+          @include pc {
+            width: 3rem;
+            font-size: 1.4rem;
+            padding-top: 0.3rem;
+          }
+          @include sp {
+            width: 2.2rem;
+            font-size: 1.2rem;
+            padding-top: 0.2rem;
+          }
+        }
+      }
+      &__header {
+        background: var(--beige3);
+        border-radius: 9999px;
+        padding: 0.2rem 1rem;
+        span {
+          @include pc {
+            font-size: 1.2rem;
+          }
+          @include sp {
+            font-size: 1.1rem;
+          }
+        }
+      }
+      &__body {
+        display: flex;
+        flex-direction: column;
+        @include pc {
+          row-gap: 1.5rem;
+        }
+        @include sp {
+          row-gap: 1rem;
+        }
+        a,
+        span {
+          @include pc {
+            height: 3rem;
+          }
+          @include sp {
+            height: 2.2rem;
+          }
+        }
+        a {
+          border-radius: 50%;
+          @include hover {
+            transition: background 0.3s ease-out;
+            &:hover {
+              background: var(--beige4);
+            }
+          }
+        }
+      }
+      &__week {
+        span {
+          opacity: 0.4;
+        }
+      }
+    }
+    &__caption {
+      @include pc {
+        padding: 0 2rem;
+      }
+      @include sp {
+        padding: 0 1.5rem 0.1rem;
+      }
+      &__title {
+        display: block;
+        line-height: 1.5;
+        letter-spacing: 0.08em;
+        @include pc {
+          font-size: 1.8rem;
+        }
+        @include sp {
+          font-size: 1.5rem;
+        }
+      }
+      &__date {
+        display: block;
+        line-height: 1.5;
+        letter-spacing: 0.05em;
+        @include pc {
+          font-size: 1.25rem;
+          margin-top: 0.1rem;
+        }
+        @include sp {
+          font-size: 0.95rem;
+        }
+      }
+      &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        line-height: 1.5;
+        letter-spacing: 0.05em;
+        border-top: 1px solid var(--beige3);
+        @include pc {
+          font-size: 1.3rem;
+          margin-top: 0.8rem;
+          padding-top: 1rem;
+        }
+        @include sp {
+          font-size: 1rem;
+          margin-top: 0.6rem;
+          padding-top: 0.8rem;
+        }
+        div {
+          display: flex;
+          column-gap: 0.5rem;
+          dt {
+            &::after {
+              content: ':';
+            }
+          }
+        }
+      }
+    }
+  }
+</style>
