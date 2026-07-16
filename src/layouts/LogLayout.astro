@@ -313,6 +313,7 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
   const { Engine, Runner, Bodies, Body, Composite, Svg, Vertices, Query } = Matter;
 
   const onaka = document.querySelector<HTMLElement>('.log__canvas')!;
+
   const tooltip = onaka.querySelector<HTMLElement>('.tooltip')!;
   const tooltipTime = tooltip.querySelector<HTMLSpanElement>('.tooltip__time')!;
   const tooltipMotif = tooltip.querySelector<HTMLSpanElement>('.tooltip__motif')!;
@@ -322,8 +323,7 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
   let hoveredCandy: Candy | undefined;
   const removingBodies = new WeakSet<Matter.Body>();
 
-  const onakaWidth = onaka.clientWidth;
-  const onakaHeight = onaka.clientHeight;
+  let floor: Matter.Body;
 
   // const debugSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   // debugSvg.classList.add('collision-debug');
@@ -376,7 +376,26 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
     updateTooltip(candy);
   };
 
-  const showTooltip = (event: TouchEvent) => {
+  const clearHover = () => {
+    hoveredCandy?.element.classList.remove('is-current');
+    hoveredCandy = undefined;
+  };
+
+  const hideTooltip = () => {
+    clearHover();
+    gsap.killTweensOf(tooltip);
+    gsap.to(tooltip, {
+      autoAlpha: 0,
+      duration: 0.3,
+      ease: 'power1.out',
+      onComplete: () => {
+        tooltip.hidden = true;
+        onaka.style.cursor = '';
+      },
+    });
+  };
+
+  const updateTouch = (event: TouchEvent) => {
     const touch = event.touches[0];
     const rect = onaka.getBoundingClientRect();
 
@@ -398,30 +417,10 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
     updateTooltip(candy);
   };
 
-  const clearHover = () => {
-    hoveredCandy?.element.classList.remove('is-current');
-    hoveredCandy = undefined;
-  };
-
-  const hideTooltip = () => {
-    clearHover();
-    gsap.killTweensOf(tooltip);
-    gsap.to(tooltip, {
-      autoAlpha: 0,
-      duration: 0.3,
-      ease: 'power1.out',
-      onComplete: () => {
-        tooltip.hidden = true;
-        onaka.style.cursor = '';
-      },
-    });
-  };
-
   onaka.addEventListener('mouseenter', updateHover);
   onaka.addEventListener('mousemove', updateHover);
   onaka.addEventListener('mouseleave', hideTooltip);
-
-  onaka.addEventListener('touchstart', showTooltip);
+  onaka.addEventListener('touchstart', updateTouch);
 
   const engine = Engine.create({ enableSleeping: true });
 
@@ -471,20 +470,6 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
   const bodies: Matter.Body[] = [];
   const bodyMap = new Map<Matter.Body, Candy>();
   const elements = [...onaka.querySelectorAll<HTMLSpanElement>('.motif')];
-
-  const fallGap = 120;
-  const wallThickness = 20;
-  const wallOptions = { isStatic: true };
-  const spawnAreaHeight = elements.length * fallGap + 200;
-  const sideWallHeight = onakaHeight + spawnAreaHeight;
-  const sideWallY = (onakaHeight - spawnAreaHeight) / 2;
-
-  const floor = Bodies.rectangle(onakaWidth / 2, onakaHeight + wallThickness / 2, onakaWidth, wallThickness, wallOptions);
-  const leftWall = Bodies.rectangle(-wallThickness / 2, sideWallY, wallThickness, sideWallHeight, wallOptions);
-  const rightWall = Bodies.rectangle(onakaWidth + wallThickness / 2, sideWallY, wallThickness, sideWallHeight, wallOptions);
-  const walls = [floor, leftWall, rightWall];
-
-  Composite.add(engine.world, walls);
 
   const variantHistory = new Map<string, string[]>();
   const getVariant = (name: string, variants: readonly string[]) => {
@@ -555,6 +540,24 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
   };
 
   const init = async () => {
+    const fallGap = 120;
+    const wallThickness = 20;
+    const wallOptions = { isStatic: true };
+
+    const onakaWidth = onaka.clientWidth;
+    const onakaHeight = onaka.clientHeight;
+
+    const spawnAreaHeight = elements.length * fallGap + 200;
+    const sideWallHeight = onakaHeight + spawnAreaHeight;
+    const sideWallY = (onakaHeight - spawnAreaHeight) / 2;
+
+    floor = Bodies.rectangle(onakaWidth / 2, onakaHeight + wallThickness / 2, onakaWidth, wallThickness, wallOptions);
+    const leftWall = Bodies.rectangle(-wallThickness / 2, sideWallY, wallThickness, sideWallHeight, wallOptions);
+    const rightWall = Bodies.rectangle(onakaWidth + wallThickness / 2, sideWallY, wallThickness, sideWallHeight, wallOptions);
+    const walls = [floor, leftWall, rightWall];
+
+    Composite.add(engine.world, walls);
+
     elements.forEach((element) => {
       element.style.visibility = 'hidden';
     });
@@ -664,14 +667,15 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
     update();
   };
 
-  let resizeTimer: number;
+  window.addEventListener('load', () => {
+    init();
+  });
 
+  let resizeTimer: number;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
       window.location.reload();
     }, 200);
   });
-
-  init();
 </script>
