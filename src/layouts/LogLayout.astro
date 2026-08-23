@@ -111,6 +111,11 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
           'b',
           'c',
         ),
+        macaron: (
+          'a',
+          'b',
+          'c',
+        ),
       );
       .motif {
         position: absolute;
@@ -432,7 +437,8 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
     40: { name: 'bean', width: 46 * motifScale, height: 30 * motifScale, density: 0.004, variants: ['a', 'b'] },
     60: { name: 'candy', width: 66 * motifScale, height: 36 * motifScale, density: 0.004, variants: ['a', 'b'] },
     80: { name: 'haribo', width: 58 * motifScale, height: 91 * motifScale, density: 0.002, variants: ['a', 'b', 'c'] },
-    100: { name: 'lolipop', width: 96 * motifScale, height: 168 * motifScale, density: 0.001, variants: ['a', 'b', 'c'] },
+    100: { name: 'lolipop', width: 86 * motifScale, height: 150 * motifScale, density: 0.001, variants: ['a', 'b', 'c'] },
+    120: { name: 'macaron', width: 104 * motifScale, height: 94 * motifScale, density: 0.001, variants: ['a', 'b', 'c'] },
   } as const;
 
   const vertexCache = new Map<string, Matter.Vector[][]>();
@@ -562,6 +568,7 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
 
     await Promise.all(Object.values(motifs).map(({ name }) => loadVertexSets(name)));
 
+    const maxMotifAmount = Math.max(...Object.keys(motifs).map(Number));
     let spitUpIndex = 0;
 
     for (const [index, element] of elements.entries()) {
@@ -573,7 +580,7 @@ const nextHref = index < logs.length - 1 ? `/onaka-mi/${logs[index + 1].date}/` 
 
       const isSpitUp = signedAmount < 0;
       const amount = Math.abs(signedAmount);
-      const key = Math.min(Math.max(Math.ceil(amount / 20) * 20, 20), 100) as keyof typeof motifs;
+      const key = Math.min(Math.max(Math.ceil(amount / 20) * 20, 20), maxMotifAmount) as keyof typeof motifs;
       const motif = motifs[key];
       const variant = getVariant(motif.name, motif.variants);
       const motifNameClass = `motif--${motif.name}`;

@@ -17,6 +17,7 @@ const collections = [
       { image: 'candy_b', alt: 'キャンディ' },
       { image: 'haribo_a', alt: 'ハリボー' },
       { image: 'lolipop_a', alt: 'ペロペロキャンディ' },
+      { image: 'macaron_a', alt: 'マカロン' },
     ],
   },
   {
@@ -54,6 +55,14 @@ const collections = [
       { image: 'lolipop_a', alt: 'ペロペロキャンディ' },
       { image: 'lolipop_b', alt: 'ペロペロキャンディ' },
       { image: 'lolipop_c', alt: 'ペロペロキャンディ' },
+    ],
+  },
+  {
+    title: '101ml ~ 120ml',
+    motifs: [
+      { image: 'macaron_a', alt: 'マカロン' },
+      { image: 'macaron_b', alt: 'マカロン' },
+      { image: 'macaron_c', alt: 'マカロン' },
     ],
   },
 ];
@@ -159,11 +168,11 @@ const collections = [
             display: flex;
             align-items: center;
             @include pc {
-              height: 6rem;
+              height: 5rem;
               column-gap: 1rem;
             }
             @include sp {
-              height: 4.2rem;
+              height: 3.8rem;
               column-gap: 0.7rem;
             }
             .motif {
@@ -174,19 +183,22 @@ const collections = [
                 font-size: 0.7rem;
               }
               &--heart {
-                width: 2em;
+                width: 1.8em;
               }
               &--bean {
-                width: 2.4em;
+                width: 2em;
               }
               &--candy {
-                width: 3.5em;
-              }
-              &--haribo {
                 width: 2.7em;
               }
+              &--haribo {
+                width: 2.2em;
+              }
               &--lolipop {
-                width: 3em;
+                width: 2.5em;
+              }
+              &--macaron {
+                width: 3.2em;
               }
             }
           }
